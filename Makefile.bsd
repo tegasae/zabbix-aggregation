@@ -1,0 +1,12 @@
+CC=clang
+CFLAGS= -fPIC -shared
+INC=-I ../../../include -I/usr/local/include
+SRC=aggregation.c
+OUTPUT= aggregation.so
+
+
+all:
+	$(CC) $(CFLAGS) -o $(OUTPUT) $(SRC) $(INC)
+
+
+

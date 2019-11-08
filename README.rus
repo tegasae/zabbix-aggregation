@@ -1,0 +1,68 @@
+Модуль aggregation для zabbix 4.*
+
+    Описание
+	Модуль aggregation
+	Item: aggregation.triggers_lld
+	Считает количество триггеров из правила обнаружения в указанном состоянии.
+	Модуль работает только на zabbix сервере
+
+
+    Сборка из исходных тесктов
+	cd <source_zabbix>
+	./configure
+	cd <source_zabbix>/src/modules/
+	git clone https://github.com/tegasae/zabbix-aggregation.git
+	cd zabbix_aggregation
+
+	a) Linux
+	    make
+	b) FreeBSD
+	gmake 
+	или 
+	make -f Makefile.bsd
+
+
+    Откомпилированные
+	linux/aggregation.so
+	freebsd/aggregation.so
+
+
+    Установка
+	Скопируйте файл aggregation.so в директорию указанную в zabbix_server.conf в опции LoadModulePath.
+	
+
+	Добавьте в zabbix_server.conf
+	LoadModule=aggregation.so
+	
+	Перезапустите zabbix server
+
+
+    Элемент данных
+	aggregation.triggers_lld[host,discovery rule,trigger state, trigger prototype name1, trigger prototype name2, etc]
+	host - имя хоста. Можно использовать {HOST.HOST}
+	trigger state:
+	    1 - trigger is up
+	    0 - trgger is down
+	
+	Например:
+	aggregation.triggers_lld[{HOST.HOST},"vfs.fs.discovery",0,"{#FSNAME}: Disk space is critically low (used > {\$VFS.FS.PUSED.MAX.CRIT:\"{#FSNAME}\"}%)", "{#FSNAME}: Disk space is low (used > {\$VFS.FS.PUSED.MAX.WARN:\"{#FSNAME}\"}%)"]
+	или
+	aggregation.triggers_lld["my host","vfs.fs.discovery",1,"{#FSNAME}: Disk space is critically low (used > {\$VFS.FS.PUSED.MAX.CRIT:\"{#FSNAME}\"}%)"]
+	Для экранирования " и $ используется бакслэш.
+
+	Элемент данных возвращает количество всех указанных триггеров в указанном состоянии.
+
+
+    При использовании прокси
+	Если хост мониторится через прокси, то aggregation.triggers_lld ничего не вернет. Так как триггеры не обрабатываются на прокси.
+	В этом случае необходимо добавить дополнительный хост и добавить элемент данных. В элементе данных указать имя хоста, которое мы хотим мониторить.
+	Хост не должен мониторится через прокси.
+
+	fake_my_host:
+	    aggregation.triggers_lld["host that is monitored through a proxy","vfs.fs.discovery",1,"{#FSNAME}: Disk space is critically low (used > {\$VFS.FS.PUSED.MAX.CRIT:\"{#FSNAME}\"}%)"]
+	
+	
+    Тестировался
+	Zabbix 4.0 и zabbix 4.4
+	Linux SMP Debian 4.19.67-2 (2019-08-28) x86_64 GNU/Linux
+	FreeBSD 11.2-RELEASE-p4
