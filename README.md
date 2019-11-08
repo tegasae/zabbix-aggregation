@@ -18,7 +18,7 @@
 	    make
 	b) FreeBSD
 	gmake 
-	или 
+	or 
 	make -f Makefile.bsd
 
 
